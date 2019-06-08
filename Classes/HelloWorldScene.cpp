@@ -36,7 +36,7 @@ Scene* HelloWorld::createScene()
 	auto world = scene->getPhysicsWorld();
 	auto gravity = Vec2(0, -98);
 	world->setGravity(gravity);
-	world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	// world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 	return scene;
 }
 
@@ -120,6 +120,19 @@ bool HelloWorld::init()
 	auto spriteBatch = SpriteBatchNode::create("blocks.png", 150);
 	this->addChild(spriteBatch, 0, kTagSpriteManager);
 
+	// Label
+	auto label = Label::createWithTTF("Tap screen",
+		"fonts/Marker Felt.ttf", 32);
+	this->addChild(label,0);
+	label->setColor(Color3B::BLUE);
+	label->setPosition(visibleSize.width / 2, visibleSize.height - 50);
+
+	// Touch listener
+	auto touchListener = EventListenerTouchOneByOne::create();
+	touchListener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan,this);
+	touchListener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded,this);
+	getEventDispatcher()->addEventListenerWithFixedPriority(touchListener, -128);
+	
 	return true;
 }
 
@@ -143,4 +156,15 @@ void HelloWorld::onEnter()
 	
 	// Sprite
 	addNewSpriteWithCoords(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+}
+
+bool HelloWorld::onTouchBegan(Touch* touch, Event* event)
+{
+	return true;
+}
+
+void HelloWorld::onTouchEnded(Touch* touch, Event* event)
+{
+	addNewSpriteWithCoords(Director::getInstance()->convertToGL(
+		touch->getLocationInView()));
 }

@@ -43,7 +43,9 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 	void onEnter() override;
-	Size visibleSize;
+	Size visibleSize;	
+	bool onTouchBegan(Touch* touch, Event* event);
+	void onTouchEnded(Touch* touch, Event* event);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
