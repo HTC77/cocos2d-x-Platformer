@@ -24,10 +24,39 @@
 
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
-
+enum
+{
+	kTagSpriteManager = 1,
+};
 Scene* HelloWorld::createScene()
 {
-    return HelloWorld::create();
+	auto scene = Scene::createWithPhysics();
+	auto layer =HelloWorld::create();
+	scene->addChild(layer);
+	auto world = scene->getPhysicsWorld();
+	auto gravity = Vec2(0, -98);
+	world->setGravity(gravity);
+	world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	return scene;
+}
+
+void HelloWorld::addNewSpriteWithCoords(Vec2 p)
+{
+	// //UXLOG(L"Add sprite %0.2f x %02.f",p.x,p.y);
+	auto sheet = 
+		static_cast<SpriteBatchNode*>(getChildByTag(kTagSpriteManager));
+	//We have a 64x64 sprite sheet with 4 different 32x32 images.  The following code is
+	//just randomly picking one of the images
+	int idx = (CCRANDOM_0_1() > .5 ? 0 : 1);
+	int idy = (CCRANDOM_0_1() > .5 ? 0 : 1);
+	//    CCSprite::crea
+	auto sprite = Sprite::createWithTexture(sheet->getTexture(),
+		Rect(32 * idx, 32 * idy, 32, 32));
+	sprite->setPosition(Vec2(p.x, p.y));
+	this->addChild(sprite);
+	auto spriteBody = PhysicsBody::createBox(sprite->getContentSize(),
+		PhysicsMaterial(1.0f,0.0f,0.3f));
+	sprite->setPhysicsBody(spriteBody);
 }
 
 // Print useful error message instead of segfaulting when files are not there.
@@ -47,9 +76,8 @@ bool HelloWorld::init()
         return false;
     }
 
-    auto visibleSize = Director::getInstance()->getVisibleSize();
+    visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
@@ -81,6 +109,16 @@ bool HelloWorld::init()
     /////////////////////////////
     // 3. add your codes below...
 
+	// wall
+	auto wallSprite = Node::create();
+	wallSprite->setPosition(visibleSize / 2);
+	auto wallBody = PhysicsBody::createEdgeBox(visibleSize);
+	wallSprite->setPhysicsBody(wallBody);
+	this->addChild(wallSprite);
+
+	// Sprite
+	auto spriteBatch = SpriteBatchNode::create("blocks.png", 150);
+	this->addChild(spriteBatch, 0, kTagSpriteManager);
 
 	return true;
 }
@@ -97,4 +135,12 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     //_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
+}
+
+void HelloWorld::onEnter()
+{
+	Scene::onEnter();
+	
+	// Sprite
+	addNewSpriteWithCoords(Vec2(visibleSize.width / 2, visibleSize.height / 2));
 }

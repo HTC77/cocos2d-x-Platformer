@@ -34,6 +34,7 @@ class HelloWorld : public cocos2d::Scene
 public:
     static cocos2d::Scene* createScene();
 
+    void addNewSpriteWithCoords(Vec2 p);
     virtual bool init();
     
     // a selector callback
@@ -41,6 +42,8 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
+	void onEnter() override;
+	Size visibleSize;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
